@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:40:05 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/18 12:39:30 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/20 23:03:08 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <stdbool.h>
 
 typedef struct s_input_data
 {
@@ -28,15 +29,17 @@ typedef struct s_input_data
 	long			time_tsleep;
 	long			nbr_of_eats;
 	pthread_mutex_t print_lock;
-	int				philos_born;
-	int				current_time;
+	long			philos_born;
+	long			dinner_is_done;
+	long			current_time;
 	pthread_mutex_t	var_lock;
+	
 }			t_input_data;
 
 typedef struct s_fork
 {
 	pthread_mutex_t fork;
-	int				fork_nbr;
+	long				fork_nbr;
 }	t_fork;
 
 typedef struct s_philo
@@ -46,6 +49,9 @@ typedef struct s_philo
 	t_fork			*left_fork;
 	t_fork			*right_fork;
 	long			meals_tracker;
+	int				philo_position;
+	long			philo_full;
+	pthread_mutex_t philo_mutex;
 	t_input_data 	*data;
 }	t_philo;	
 
@@ -54,5 +60,13 @@ int 	all_valid_chars(int argc, char **argv);
 long	long_atoi(const char *str);
 int		all_checkings(int argc, char **argv);
 void	print_input_error(int flag);
+void	mutex_printf(t_input_data *data, int flag, int id);
+void	mutex_var_change(pthread_mutex_t *var_lock, long *var, long new_value);
+long	mutex_var_read(pthread_mutex_t *var_lock, long *var);
+long	mutex_var_change_plus(pthread_mutex_t *var_lock, long *var);
+void 	small_sleep(t_input_data *data, long time_ms);
+long	time_in_mill(void);
+void 	take_forks(t_philo *philo);
+void 	drop_forks(t_philo *philo);
 
 #endif

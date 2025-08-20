@@ -6,11 +6,12 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:34:47 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/18 12:43:07 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/20 23:10:12 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
 
 t_input_data	*fill_data_struct(char **argv)
 {
@@ -31,8 +32,8 @@ t_input_data	*fill_data_struct(char **argv)
 			data->nbr_of_eats = -1;
 		pthread_mutex_init(&(data->print_lock), NULL);
 		data->philos_born = 0;
-		data->current_time = 0;
 		pthread_mutex_init(&(data->var_lock), NULL);
+		data->dinner_is_done = 0;
 		return (data);
 	}
 }
@@ -51,37 +52,121 @@ void	*philos_actions(void *arg)
 {
 	
 	t_philo		*philo;
+	long		dinner_done;
 	
 	philo = (t_philo *)arg;
-	while (!philo->data->philos_born)
+	
+	while (!mutex_var_read(&(philo->data->var_lock), &(philo->data->philos_born)))
 		;
-	if(philo->left_fork->fork_nbr % 2 != 0)
-		usleep(((philo)->data->time_tsleep)* 1000);
-	pthread_mutex_lock(&(philo->data->var_lock));
-	philo->data->current_time =time_in_mill();
-	if(philo->data->current_time == -1)
+	if(philo->philo_position% 2 != 0)
+		small_sleep(philo->data, (philo)->data->time_teat);
+		
+	while(mutex_var_read(&(philo->data->var_lock), &(philo->data->dinner_is_done)) != 1)
 	{
-		pthread_mutex_unlock(&(philo->data->var_lock));
-		return(NULL); 
+		if(philo->data->nbr_of_eats > 0 && mutex_var_read(&(philo->philo_mutex), &(philo->meals_tracker)) == philo->data->nbr_of_eats )
+		{
+			mutex_var_change(&(philo->philo_mutex), &(philo->philo_full), 1);
+			break;
+		}
+		take_forks(philo);
+		mutex_var_change(&(philo->philo_mutex), &(philo->last_meal_time), time_in_mill());
+		mutex_printf((philo->data), 1, philo->philo_position);
+		small_sleep(philo->data, (philo)->data->time_teat);
+		mutex_var_change_plus(&(philo->philo_mutex), &(philo->meals_tracker));
+		drop_forks(philo);
+		mutex_printf((philo->data), 2, philo->philo_position);
+		small_sleep(philo->data, (philo)->data->time_tsleep);
+
 	}
-	pthread_mutex_unlock(&(philo->data->var_lock));
-	while(1)
-	{	
-		pthread_mutex_lock(&(philo->left_fork->fork));
-		printf("philo %d has taken the left fork\n", philo->left_fork->fork_nbr);
-		pthread_mutex_lock(&(philo->right_fork->fork));
-		printf("philo %d has taken the righet fork\n", philo->left_fork->fork_nbr);
-		philo->last_meal_time = time_in_mill();
-		philo->meals_tracker = philo->meals_tracker + 1;
-		usleep(((philo)->data->time_teat)* 1000);
-		printf("philo %d is eating uwu\n", (philo->left_fork->fork_nbr));
-		pthread_mutex_unlock(&(philo->left_fork->fork));
-		pthread_mutex_unlock(&(philo->right_fork->fork));
-		pthread_mutex_lock(&(philo->data->print_lock));
-		printf("philo %d is sleeping zzzz\n", (philo->left_fork->fork_nbr));
-		usleep(((philo)->data->time_tsleep)* 1000);
-		pthread_mutex_unlock(&(philo->data->print_lock));
-	}
+	return(NULL);
+}
+// void	*tracker_function(void *arg)
+// {
+// 	int i;
+// 	t_philo  **philos;
+// 	long		curr_time;
+// 	int 		flag;
+// 	int			philo_last_meal;
+// 	int			philo_death_time;
+	
+// 	philos = (t_philo **)arg;
+// 	while(1)
+// 	{
+// 		i  = 1;
+// 		flag  = 0;
+// 		while(i <= philos[1]->data->philos_numb)
+// 		{
+// 			curr_time = time_in_mill();
+// 			philo_last_meal = mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->last_meal_time));
+// 			philo_death_time = mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->data->time_tdie));
+// 			if((curr_time - philo_last_meal) >= philo_death_time)
+// 			{
+// 				mutex_printf((philos[i]->data), 4,philos[i]->left_fork->fork_nbr);
+// 				mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
+// 				return(NULL);
+// 			}
+// 			else if(mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->meals_tracker)) < mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->data->nbr_of_eats)) || philos[i]->data->nbr_of_eats == -1)
+// 			{
+// 				flag  = 1;
+// 			}
+// 			i++;
+// 		}
+// 		if(flag  == 0)
+// 		{
+// 			i = 1;
+// 			mutex_printf((philos[i]->data), 7, -1);
+// 			mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
+// 		    return (NULL);
+// 		}
+// 	}
+// }
+void *tracker_function(void *arg)
+{
+    int i;
+    t_philo **philos;
+    long curr_time;
+    int all_satisfied;
+    long philo_last_meal;
+    long philo_death_time;
+    int meals_eaten;
+    philos = (t_philo **)arg;
+    
+    while (!mutex_var_read(&(philos[1]->data->var_lock), &(philos[1]->data->dinner_is_done)))
+    {
+        i = 1;
+        all_satisfied = 1;
+        
+        while (i <= philos[1]->data->philos_numb)
+        {
+            curr_time = time_in_mill();
+            philo_last_meal = mutex_var_read(&(philos[i]->philo_mutex), &(philos[i]->last_meal_time));
+            philo_death_time =philos[i]->data->time_tdie;
+            if ((curr_time - philo_last_meal) >= philo_death_time)
+            {
+                mutex_printf(philos[i]->data, 4, philos[i]->philo_position); // died
+                mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
+                return (NULL);
+            }
+            if (philos[i]->data->nbr_of_eats != -1)
+            {
+                meals_eaten = mutex_var_read(&(philos[i]->philo_mutex), &(philos[i]->meals_tracker));
+                if (meals_eaten < philos[i]->data->nbr_of_eats)
+                    all_satisfied = 0;
+            }
+            else
+            {
+                all_satisfied = 0;
+            }
+            
+            i++;
+        }
+        if (all_satisfied && philos[1]->data->nbr_of_eats != -1)
+        {
+            mutex_printf(philos[1]->data, 7, -1);
+            mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->dinner_is_done), 1);
+            return (NULL);
+        } 
+    }
 	return(NULL);
 }
 
@@ -115,26 +200,44 @@ t_philo	**philo_birth(t_input_data	**data)
 		philos[i] = malloc(sizeof(t_philo));
 		if (!philos[i])
 			return (NULL);
-		philos[i]->last_meal_time = 0;
-		philos[i]->right_fork = (forks[i]);
-		position = (i%((*data)->philos_numb))+1;
-		philos[i]->left_fork = (forks[position]);
+		philos[i]->last_meal_time = time_in_mill();
+			
 		philos[i]->meals_tracker = 0;
 		(philos[i])->data = (*data);
+		philos[i]->philo_position = i;
+		if(i%2 == 0)
+		{
+			philos[i]->left_fork = (forks[i]);
+			position = ((i)%((*data)->philos_numb))+1;
+			philos[i]->right_fork = (forks[position]);
+		}
+		else
+		{
+			position = ((i)%((*data)->philos_numb))+1;
+			philos[i]->left_fork = (forks[position]);
+			philos[i]->right_fork = (forks[i]);
+		} 
+		philos[i]->philo_full = 0; 
+		pthread_mutex_init(&(philos[i]->philo_mutex), NULL);
 		pthread_create(&(philos[i]->philo_thread_id), NULL, philos_actions, philos[i]);
 		i++;
 	}
-	(*data)->philos_born = 1;
+	mutex_var_change(&((*data)->var_lock), &((*data)->philos_born), 1);
 	return(philos);
 }
+
 
 void	start_philo_execution(t_input_data	**data)
 {
 	int	i;
 	
-	t_philo  **philos;
+	t_philo  	**philos;
+	pthread_t	tracker_thread;
+	
 	
 	philos = philo_birth(data);
+	mutex_var_change(&(*data)->var_lock, &(*data)->current_time ,time_in_mill());
+	pthread_create(&tracker_thread, NULL, tracker_function, philos);
 	i = 1 ;
 
 	while (i <= (*data)->philos_numb)
@@ -142,7 +245,7 @@ void	start_philo_execution(t_input_data	**data)
 		pthread_join(philos[i]->philo_thread_id, NULL);
 		i++;
 	}
-		
+	pthread_join(tracker_thread, NULL);
 }
 int	main(int argc, char **argv)
 {
