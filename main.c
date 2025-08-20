@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:34:47 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/20 23:10:12 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 00:36:20 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	*philos_actions(void *arg)
 	while (!mutex_var_read(&(philo->data->var_lock), &(philo->data->philos_born)))
 		;
 	if(philo->philo_position% 2 != 0)
-		small_sleep(philo->data, (philo)->data->time_teat);
+		small_sleep(philo->data, (philo)->data->time_teat/2);
 		
 	while(mutex_var_read(&(philo->data->var_lock), &(philo->data->dinner_is_done)) != 1)
 	{
@@ -80,46 +80,7 @@ void	*philos_actions(void *arg)
 	}
 	return(NULL);
 }
-// void	*tracker_function(void *arg)
-// {
-// 	int i;
-// 	t_philo  **philos;
-// 	long		curr_time;
-// 	int 		flag;
-// 	int			philo_last_meal;
-// 	int			philo_death_time;
-	
-// 	philos = (t_philo **)arg;
-// 	while(1)
-// 	{
-// 		i  = 1;
-// 		flag  = 0;
-// 		while(i <= philos[1]->data->philos_numb)
-// 		{
-// 			curr_time = time_in_mill();
-// 			philo_last_meal = mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->last_meal_time));
-// 			philo_death_time = mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->data->time_tdie));
-// 			if((curr_time - philo_last_meal) >= philo_death_time)
-// 			{
-// 				mutex_printf((philos[i]->data), 4,philos[i]->left_fork->fork_nbr);
-// 				mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
-// 				return(NULL);
-// 			}
-// 			else if(mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->meals_tracker)) < mutex_var_read(&(philos[i]->data->var_lock), &(philos[i]->data->nbr_of_eats)) || philos[i]->data->nbr_of_eats == -1)
-// 			{
-// 				flag  = 1;
-// 			}
-// 			i++;
-// 		}
-// 		if(flag  == 0)
-// 		{
-// 			i = 1;
-// 			mutex_printf((philos[i]->data), 7, -1);
-// 			mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
-// 		    return (NULL);
-// 		}
-// 	}
-// }
+
 void *tracker_function(void *arg)
 {
     int i;
@@ -131,10 +92,9 @@ void *tracker_function(void *arg)
     int meals_eaten;
     philos = (t_philo **)arg;
     
-    while (!mutex_var_read(&(philos[1]->data->var_lock), &(philos[1]->data->dinner_is_done)))
+    while (1)
     {
         i = 1;
-        all_satisfied = 1;
         
         while (i <= philos[1]->data->philos_numb)
         {
@@ -143,29 +103,18 @@ void *tracker_function(void *arg)
             philo_death_time =philos[i]->data->time_tdie;
             if ((curr_time - philo_last_meal) >= philo_death_time)
             {
-                mutex_printf(philos[i]->data, 4, philos[i]->philo_position); // died
+                mutex_printf(philos[i]->data, 4, philos[i]->philo_position);
                 mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
                 return (NULL);
             }
-            if (philos[i]->data->nbr_of_eats != -1)
+            if (mutex_var_read(&(philos[i])->philo_mutex, &(philos[i]->philo_full))== 1)
             {
-                meals_eaten = mutex_var_read(&(philos[i]->philo_mutex), &(philos[i]->meals_tracker));
-                if (meals_eaten < philos[i]->data->nbr_of_eats)
-                    all_satisfied = 0;
+				mutex_printf(philos[i]->data, 4, philos[i]->philo_position);
+                mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
+				return(NULL);
             }
-            else
-            {
-                all_satisfied = 0;
-            }
-            
             i++;
         }
-        if (all_satisfied && philos[1]->data->nbr_of_eats != -1)
-        {
-            mutex_printf(philos[1]->data, 7, -1);
-            mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->dinner_is_done), 1);
-            return (NULL);
-        } 
     }
 	return(NULL);
 }

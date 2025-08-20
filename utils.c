@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 20:15:38 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/20 23:04:06 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 00:23:24 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,21 +60,20 @@ void	mutex_printf(t_input_data *data, int flag, int id)
 {
 	long	time;
 
-
 	pthread_mutex_lock(&(data->print_lock));
-	printf("%lu ", time_in_mill() - mutex_var_read(&(data->var_lock), &(data->current_time)));
+	time = time_in_mill() - mutex_var_read(&(data->var_lock), &(data->current_time));
 	if(flag == 1 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("philosopher %d is eating\n", id);
+		printf("%lu philosopher %d is eating\n", time, id);
 	else if(flag == 2 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("philosopher %d is sleeping\n", id);
+		printf("%lu philosopher %d is sleeping\n", time,id);
 	else if(flag == 3 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))	
-		printf("philosopher %d is thinking\n", id);
+		printf("%lu philosopher %d is thinking\n", time,id);
 	else if(flag == 4)
-		printf("philosopher %d is dead\n", id);
+		printf("%lu philosopher %d is dead\n", time,id);
 	else if(flag == 5 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("philosopher %d has taken the first fork\n", id);
+		printf("%lu philosopher %d has taken the first fork\n", time,id);
 	else if(flag == 6 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("philosopher %d has taken the second fork\n", id);
+		printf("%lu philosopher %d has taken the second fork\n", time,id);
 	else if(flag == 7)
 		printf("philosophers are full\n");
 	pthread_mutex_unlock(&(data->print_lock));
@@ -88,7 +87,7 @@ void	mutex_var_change(pthread_mutex_t *var_lock, long *var, long new_value)
 }
 long	mutex_var_read(pthread_mutex_t *var_lock, long *var)
 {
-	int value;
+	long value;
 	
 	pthread_mutex_lock(var_lock);
 	value = *var;
@@ -112,4 +111,11 @@ void small_sleep(t_input_data *data, long time_ms)
             break;
         usleep(100); // sleep 100 microseconds at a time
     }
+}
+void print_time(t_input_data *data, long time)
+{
+	pthread_mutex_lock(&(data->print_lock));
+
+	printf("%lu\n", time);
+	pthread_mutex_unlock(&(data->print_lock));
 }

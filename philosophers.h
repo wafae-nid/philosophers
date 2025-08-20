@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:40:05 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/20 23:03:08 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/20 23:50:47 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,6 @@ void 	small_sleep(t_input_data *data, long time_ms);
 long	time_in_mill(void);
 void 	take_forks(t_philo *philo);
 void 	drop_forks(t_philo *philo);
+void 	print_time(t_input_data *data, long time);
 
 #endif
