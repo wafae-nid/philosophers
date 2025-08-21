@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:34:47 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/21 03:51:49 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 18:34:46 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,9 @@ void	*philos_actions(void *arg)
 		small_sleep(philo->data, (philo)->data->time_teat/2);
 	while(mutex_var_read(&(philo->data->var_lock), &(philo->data->dinner_is_done)) != 1)
 	{
-		if(philo->data->nbr_of_eats > 0 && mutex_var_read(&(philo->philo_mutex), &(philo->meals_tracker)) == philo->data->nbr_of_eats )
-		{
+		if(philo->data->nbr_of_eats > 0 && mutex_var_read(&(philo->philo_mutex), &(philo->meals_tracker)) >= philo->data->nbr_of_eats) {
 			mutex_var_change(&(philo->philo_mutex), &(philo->philo_full), 1);
-			break;
+			continue;
 		}
 		take_forks(philo);
 		mutex_var_change(&(philo->philo_mutex), &(philo->last_meal_time), time_in_mill());
@@ -75,7 +74,6 @@ void	*philos_actions(void *arg)
 		drop_forks(philo);
 		mutex_printf((philo->data), 2, philo->philo_position);
 		small_sleep(philo->data, (philo)->data->time_tsleep);
-
 	}
 	return(NULL);
 }
@@ -94,8 +92,8 @@ void	are_they_all_full( t_philo **philos)
 	}
 	if(all_satisfied == 1)
 	{
-		mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->all_full), 1);
-		mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
+		// mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->all_full), 1);
+		mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->dinner_is_done), 1);
 	}
 		
 }
@@ -120,9 +118,11 @@ void *tracker_function(void *arg)
             philo_death_time =philos[i]->data->time_tdie;
             if ((curr_time - philo_last_meal) > philo_death_time)
             {
+				if (! mutex_var_read(&(philos[i]->philo_mutex) ,&(philos[i]->philo_full))) {
                 mutex_printf(philos[i]->data, 4, philos[i]->philo_position);
                 mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
                 return (NULL);
+				} 
             }
             i++;
         }
