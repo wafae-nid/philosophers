@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:34:47 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/21 00:36:20 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 03:34:05 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ t_input_data	*fill_data_struct(char **argv)
 			data->nbr_of_eats = -1;
 		pthread_mutex_init(&(data->print_lock), NULL);
 		data->philos_born = 0;
+		data->all_full = 0;
 		pthread_mutex_init(&(data->var_lock), NULL);
 		data->dinner_is_done = 0;
 		return (data);
@@ -55,12 +56,10 @@ void	*philos_actions(void *arg)
 	long		dinner_done;
 	
 	philo = (t_philo *)arg;
-	
 	while (!mutex_var_read(&(philo->data->var_lock), &(philo->data->philos_born)))
 		;
 	if(philo->philo_position% 2 != 0)
 		small_sleep(philo->data, (philo)->data->time_teat/2);
-		
 	while(mutex_var_read(&(philo->data->var_lock), &(philo->data->dinner_is_done)) != 1)
 	{
 		if(philo->data->nbr_of_eats > 0 && mutex_var_read(&(philo->philo_mutex), &(philo->meals_tracker)) == philo->data->nbr_of_eats )
@@ -80,22 +79,40 @@ void	*philos_actions(void *arg)
 	}
 	return(NULL);
 }
+void	are_they_all_full( t_philo **philos)
+{
+	int i;
+	int all_satisfied;
 
+	i = 1;
+	all_satisfied = 1;
+	while(i<= philos[1]->data->philos_numb)
+	{
+	 	if (mutex_var_read(&(philos[i])->philo_mutex, &(philos[i]->philo_full)) != 1)
+			all_satisfied = 0;
+		i++;
+	}
+	if(all_satisfied == 1)
+	{
+		mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->all_full), 1);
+		mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
+	}
+		
+}
 void *tracker_function(void *arg)
 {
     int i;
     t_philo **philos;
     long curr_time;
-    int all_satisfied;
+    
     long philo_last_meal;
     long philo_death_time;
     int meals_eaten;
     philos = (t_philo **)arg;
     
-    while (1)
+    while (!mutex_var_read(&(philos[1]->data->var_lock), &(philos[1]->data->dinner_is_done)))
     {
         i = 1;
-        
         while (i <= philos[1]->data->philos_numb)
         {
             curr_time = time_in_mill();
@@ -107,14 +124,9 @@ void *tracker_function(void *arg)
                 mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
                 return (NULL);
             }
-            if (mutex_var_read(&(philos[i])->philo_mutex, &(philos[i]->philo_full))== 1)
-            {
-				mutex_printf(philos[i]->data, 4, philos[i]->philo_position);
-                mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
-				return(NULL);
-            }
             i++;
         }
+		are_they_all_full(philos);
     }
 	return(NULL);
 }

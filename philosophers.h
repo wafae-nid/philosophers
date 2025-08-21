@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:40:05 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/20 23:50:47 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 00:55:44 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ typedef struct s_input_data
 	long			philos_born;
 	long			dinner_is_done;
 	long			current_time;
+	long			all_full;
 	pthread_mutex_t	var_lock;
 	
 }			t_input_data;
