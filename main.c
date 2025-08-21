@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:34:47 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/21 18:34:46 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 20:08:52 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,15 +49,21 @@ long	time_in_mill(void)
 	actual_time = (time.tv_sec *1000) + (time.tv_usec /1000);
 	return(actual_time);
 }
+
 void	*philos_actions(void *arg)
 {
-	
 	t_philo		*philo;
 	long		dinner_done;
 	
 	philo = (t_philo *)arg;
 	while (!mutex_var_read(&(philo->data->var_lock), &(philo->data->philos_born)))
 		;
+	if(philo->data->philos_numb == 1)
+	{	
+		mutex_printf((philo->data), 5, philo->philo_position);
+		usleep((philo)->data->time_tdie *1000);
+		return(NULL);
+	}
 	if(philo->philo_position% 2 != 0)
 		small_sleep(philo->data, (philo)->data->time_teat/2);
 	while(mutex_var_read(&(philo->data->var_lock), &(philo->data->dinner_is_done)) != 1)
@@ -91,11 +97,7 @@ void	are_they_all_full( t_philo **philos)
 		i++;
 	}
 	if(all_satisfied == 1)
-	{
-		// mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->all_full), 1);
 		mutex_var_change(&(philos[1]->data->var_lock), &(philos[1]->data->dinner_is_done), 1);
-	}
-		
 }
 void *tracker_function(void *arg)
 {

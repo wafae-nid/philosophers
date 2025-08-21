@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 20:15:38 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/21 03:23:11 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 20:36:09 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,46 +38,29 @@ void	print_input_error(int flag)
 	exit(EXIT_FAILURE);
 }
 
-// void mutex_printf(t_input_data *data, int action, int philo_pos)
-// {
-//     long rel_time = time_in_mill() - mutex_var_read(&(data->var_lock),&data->current_time); // relative ms
-//     pthread_mutex_lock(&data->print_lock);
-//     if (action == 1)
-//         printf("%ld philosopher %d is eating\n", rel_time, philo_pos);
-//     else if (action == 2)
-//         printf("%ld philosopher %d is sleeping\n", rel_time, philo_pos);
-//     else if (action == 3)
-//         printf("%ld philosopher %d is thinking\n", rel_time, philo_pos);
-//     else if (action == 4)
-//         printf("%ld philosopher %d died\n", rel_time, philo_pos);
-//     else if (action == 7)
-//         printf("%ld all philosophers are satisfied\n", rel_time);
-
-//     pthread_mutex_unlock(&data->print_lock);
-// }
-
 void	mutex_printf(t_input_data *data, int flag, int id)
 {
 	long	time;
 
 	pthread_mutex_lock(&(data->print_lock));
 	time = time_in_mill() - mutex_var_read(&(data->var_lock), &(data->current_time));
+	
 	if(flag == 1 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("%lu philosopher %d is eating\n", time, id);
+		printf("%lu %d is eating\n", time, id);
 	else if(flag == 2 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("%lu philosopher %d is sleeping\n", time,id);
+		printf("%lu %d is sleeping\n", time,id);
 	else if(flag == 3 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))	
-		printf("%lu philosopher %d is thinking\n", time,id);
-	else if(flag == 4)
-		printf("%lu philosopher %d is dead\n", time,id);
+		printf("%lu %d is thinking\n", time,id);
+	else if(flag == 4) {
+		printf("%lu %d is dead\n", time,id);
+		mutex_var_change(&data->var_lock, &data->dinner_is_done, 1);	
+	}
 	else if(flag == 5 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("%lu philosopher %d has taken the first fork\n", time,id);
+		printf("%lu %d has taken the first fork\n", time,id);
 	else if(flag == 6 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
-		printf("%lu philosopher %d has taken the second fork\n", time,id);
+		printf("%lu %d has taken the second fork\n", time,id);
 	else if(flag == 7)
 		printf("philosophers are full\n");
-	// else
-	// 	printf("im here\n");
 	pthread_mutex_unlock(&(data->print_lock));
 }
 
@@ -111,7 +94,7 @@ void small_sleep(t_input_data *data, long time_ms)
     {
         if (mutex_var_read(&data->var_lock, &data->dinner_is_done))
             break;
-        usleep(100); // sleep 100 microseconds at a time
+        usleep(100); 
     }
 }
 void print_time(t_input_data *data, long time)
