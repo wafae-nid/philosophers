@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:34:47 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/21 03:34:05 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/21 03:51:49 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void *tracker_function(void *arg)
             curr_time = time_in_mill();
             philo_last_meal = mutex_var_read(&(philos[i]->philo_mutex), &(philos[i]->last_meal_time));
             philo_death_time =philos[i]->data->time_tdie;
-            if ((curr_time - philo_last_meal) >= philo_death_time)
+            if ((curr_time - philo_last_meal) > philo_death_time)
             {
                 mutex_printf(philos[i]->data, 4, philos[i]->philo_position);
                 mutex_var_change(&(philos[i]->data->var_lock), &(philos[i]->data->dinner_is_done), 1);
