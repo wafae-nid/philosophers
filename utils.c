@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 20:15:38 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/21 20:36:09 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/22 02:41:22 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void	print_input_error(int flag)
 		printf("arguments should be 5 or optionally 6 ....try again :) \n");
 	else 
 		printf("arguments should be all positive numbers and less than int max .... try again:) \n");
-	exit(EXIT_FAILURE);
 }
 
 void	mutex_printf(t_input_data *data, int flag, int id)
@@ -51,7 +50,8 @@ void	mutex_printf(t_input_data *data, int flag, int id)
 		printf("%lu %d is sleeping\n", time,id);
 	else if(flag == 3 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))	
 		printf("%lu %d is thinking\n", time,id);
-	else if(flag == 4) {
+	else if(flag == 4) 
+	{
 		printf("%lu %d is dead\n", time,id);
 		mutex_var_change(&data->var_lock, &data->dinner_is_done, 1);	
 	}
@@ -60,7 +60,7 @@ void	mutex_printf(t_input_data *data, int flag, int id)
 	else if(flag == 6 && !mutex_var_read(&(data->var_lock),&(data->dinner_is_done)))
 		printf("%lu %d has taken the second fork\n", time,id);
 	else if(flag == 7)
-		printf("philosophers are full\n");
+		printf("pthread_create_failed\n");
 	pthread_mutex_unlock(&(data->print_lock));
 }
 
@@ -97,10 +97,10 @@ void small_sleep(t_input_data *data, long time_ms)
         usleep(100); 
     }
 }
-void print_time(t_input_data *data, long time)
-{
-	pthread_mutex_lock(&(data->print_lock));
+// void print_time(t_input_data *data, long time)
+// {
+// 	pthread_mutex_lock(&(data->print_lock));
 
-	printf("%lu\n", time);
-	pthread_mutex_unlock(&(data->print_lock));
-}
+// 	printf("%lu\n", time);
+// 	pthread_mutex_unlock(&(data->print_lock));
+// }

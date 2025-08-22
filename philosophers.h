@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:40:05 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/21 00:55:44 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/22 02:42:04 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,23 @@ typedef struct s_philo
 	int				philo_position;
 	long			philo_full;
 	pthread_mutex_t philo_mutex;
+	long			thread_fail;
 	t_input_data 	*data;
-}	t_philo;	
+}	t_philo;
+
+typedef struct s_helper
+{
+	long curr_time;
+    long last_meal;
+    long death_time;
+    int meals_eaten;
+}	t_helper;
+
+typedef struct s_trash
+{
+	void					*point;
+	struct s_trash	*next;
+}					t_trash;
 
 int		ft_is_a_numb(char c);
 int 	all_valid_chars(int argc, char **argv);
@@ -69,6 +84,7 @@ void 	small_sleep(t_input_data *data, long time_ms);
 long	time_in_mill(void);
 void 	take_forks(t_philo *philo);
 void 	drop_forks(t_philo *philo);
-void 	print_time(t_input_data *data, long time);
+void	*gc_malloc(size_t size);
+// void 	print_time(t_input_data *data, long time);
 
 #endif
