@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 17:24:31 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/22 18:14:43 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/23 01:58:20 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,25 @@
 
 void	thread_cleaning(t_philo **philos, int i)
 {
-	while (i >= 1)
+	t_fork	**fork;
+	int		j;
+
+	fork = fork_arry_saving(NULL);
+	if (fork)
 	{
-		pthread_join(philos[i]->philo_id, NULL);
-		i--;
+		j = 1;
+		while (j <= philos[1]->data->philo_num)
+		{
+			pthread_mutex_destroy(&(fork[j]->fork));
+			j++;
+		}
+	}
+	j = 1;
+	while (j <= i)
+	{
+		pthread_join(philos[j]->philo_id, NULL);
+		pthread_mutex_destroy(&philos[j]->philo_mtx);
+		j++;
 	}
 }
 

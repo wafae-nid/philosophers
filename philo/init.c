@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 17:08:36 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/22 18:13:47 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/23 02:02:33 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ t_input_data	*fill_data_struct(char **argv)
 			return (NULL);
 		(1 && (data->philos_born = 0), (data->all_full = 0));
 		if (pthread_mutex_init(&(data->v_lock), NULL) != 0)
-			return (NULL);
+			return (pthread_mutex_destroy(&data->print_lock), NULL);
 		data->end = 0;
 		return (data);
 	}
@@ -83,12 +83,12 @@ t_philo	**philo_struct_alloc(t_input_data *data, t_fork **forks,
 		philos[i]->full = 0;
 		if (pthread_mutex_init(&(philos[i]->philo_mtx), NULL))
 		{
-			thread_cleaning(philos, i - 1);
+			thread_cleaning(philos, i);
 			return (NULL);
 		}
 		if (pthread_create(&(philos[i]->philo_id), NULL, actions, philos[i]))
 		{
-			thread_cleaning(philos, i - 1);
+			thread_cleaning(philos, i);
 			return (NULL);
 		}
 	}

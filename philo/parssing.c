@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:47:54 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/23 01:00:48 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/23 01:05:55 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ long	atol(const char *str)
 		str++;
 	while (*str >= '0' && *str <= '9')
 	{
+		if (num > INT_MAX)
+			return (-1);
 		num = num * 10 + (*str++ - 48);
 	}
 	return (num);
@@ -73,7 +75,7 @@ int	all_checkings(int argc, char **argv)
 		while (i < argc)
 		{
 			number = atol(argv[i]);
-			if (number > INT_MAX)
+			if (number > INT_MAX || number <= 0)
 				return (0);
 			i++;
 		}
