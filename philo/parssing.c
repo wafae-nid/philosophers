@@ -6,13 +6,13 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:47:54 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/17 06:05:07 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/23 01:00:48 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-long	long_atoi(const char *str)
+long	atol(const char *str)
 {
 	long long	num;
 
@@ -37,42 +37,42 @@ int	ft_is_a_numb(char c)
 		return (0);
 }
 
-int all_valid_chars(int argc, char **argv)
+int	all_valid_chars(int argc, char **argv)
 {
-	int	i;
-	int	j;
-	
-	i  = 1;
+	int		i;
+	int		j;
+
+	i = 1;
 	while (i < argc)
 	{
 		j = 0;
 		while (argv[i][j])
 		{
 			if (j == 0 && (!ft_is_a_numb(argv[i][j]) && (argv[i][j] != '+')))
-				return(0);
+				return (0);
 			else
 			{
-				if(j >= 1 && !ft_is_a_numb(argv[i][j]))
-					return(0);
+				if (j >= 1 && !ft_is_a_numb(argv[i][j]))
+					return (0);
 			}
 			j++;
 		}
 		i++;
 	}
-	return(1);
-	
+	return (1);
 }
+
 int	all_checkings(int argc, char **argv)
 {
 	long	number;
+	int		i;
 
-	int	i;
 	i = 1;
 	if (all_valid_chars(argc, argv))
 	{
-		while(i < argc)
+		while (i < argc)
 		{
-			number = long_atoi(argv[i]);
+			number = atol(argv[i]);
 			if (number > INT_MAX)
 				return (0);
 			i++;

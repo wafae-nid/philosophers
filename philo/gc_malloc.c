@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 02:28:49 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/22 02:43:24 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/22 11:39:38 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ void	free_global_garbage(t_trash **trash)
 
 static void	*collection(t_trash **trash, size_t size)
 {
-	t_trash				*new;
-	void						*ptr;
+	t_trash	*new;
+	void	*ptr;
 
 	new = malloc(sizeof(t_trash));
 	if (!new)
@@ -52,13 +52,12 @@ static void	*collection(t_trash **trash, size_t size)
 void	*gc_malloc(size_t size)
 {
 	static t_trash	*trash;
-	void					*ptr;
+	void			*ptr;
 
 	ptr = NULL;
 	if (size)
 		ptr = collection(&trash, size);
 	else
 		free_global_garbage(&trash);
-	
 	return (ptr);
 }
