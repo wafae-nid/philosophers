@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 17:22:23 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/22 18:08:19 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/24 04:03:52 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,13 @@ void	mutex_printf(t_input_data *data, int flag, int id)
 		printf("%lu %d is thinking\n", time, id);
 	else if (flag == 4)
 	{
-		printf("%lu %d is dead\n", time, id);
+		printf("%lu %d died\n", time, id);
 		mutex_var_change(&data->v_lock, &data->end, 1);
 	}
 	else if (flag == 5 && !mutex_read(&(data->v_lock), &(data->end)))
-		printf("%lu %d has taken the first fork\n", time, id);
+		printf("%lu %d  has taken a fork\n", time, id);
 	else if (flag == 6 && !mutex_read(&(data->v_lock), &(data->end)))
-		printf("%lu %d has taken the second fork\n", time, id);
+		printf("%lu %d  has taken a fork\n", time, id);
 	else if (flag == 7 && !mutex_read(&(data->v_lock), &(data->end)))
 		printf("%lu %d is thinking\n", time, id);
 	pthread_mutex_unlock(&(data->print_lock));

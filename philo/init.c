@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 17:08:36 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/23 02:02:33 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/24 03:52:23 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,8 @@ t_fork	**fork_struct_alloc(t_input_data *data, t_fork **forks)
 }
 
 t_philo	**philo_struct_alloc(t_input_data *data, t_fork **forks,
-	t_philo **philos)
+	t_philo **philos, int i)
 {
-	int		i;
-
-	i = 0;
 	while (++i <= (data)->philo_num)
 	{
 		philos[i] = gc_malloc(sizeof(t_philo));
@@ -88,6 +85,7 @@ t_philo	**philo_struct_alloc(t_input_data *data, t_fork **forks,
 		}
 		if (pthread_create(&(philos[i]->philo_id), NULL, actions, philos[i]))
 		{
+			mutex_var_change(&(philos[1]->data)->v_lock, &((philos[1]->data)->philos_born), 1);
 			thread_cleaning(philos, i);
 			return (NULL);
 		}
@@ -100,7 +98,7 @@ t_philo	**philo_birth(t_input_data	**data)
 {
 	t_philo	**philos;
 	t_fork	**forks;
-
+	
 	philos = gc_malloc(((*data)->philo_num + 1) * sizeof(t_philo *));
 	if (!philos)
 		return (NULL);
@@ -109,7 +107,7 @@ t_philo	**philo_birth(t_input_data	**data)
 	if (!forks)
 		return (NULL);
 	fork_arry_saving(forks);
-	return (philo_struct_alloc(*data, forks, philos));
+	return (philo_struct_alloc(*data, forks, philos, 0));
 }
 
 void	start_philo_execution(t_input_data	**data)

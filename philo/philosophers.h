@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/17 02:40:05 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/23 01:29:05 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/24 03:52:58 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 # include <stdlib.h>
 # include <pthread.h>
 # include <sys/time.h>
-# include <stdbool.h>
 
 typedef struct s_input_data
 {
@@ -89,8 +88,10 @@ t_fork			**fork_arry_saving(t_fork **fork);
 void			*gc_malloc(size_t size);
 t_input_data	*fill_data_struct(char **argv);
 t_fork			**fork_struct_alloc(t_input_data *data, t_fork **forks);
-t_philo			**philo_struct_alloc(t_input_data *data, t_fork **forks,
-					t_philo **philos);
+// t_philo			**philo_struct_alloc(t_input_data *data, t_fork **forks,
+// 					t_philo **philos);
+t_philo	**philo_struct_alloc(t_input_data *data, t_fork **forks,
+	t_philo **philos, int i);
 t_philo			**philo_birth(t_input_data	**data);
 void			start_philo_execution(t_input_data	**data);
 void			thread_cleaning(t_philo **philos, int i);

@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 17:24:31 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/23 01:58:20 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/24 02:12:20 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void	thread_cleaning(t_philo **philos, int i)
 	j = 1;
 	while (j <= i)
 	{
+		
+		mutex_var_change(&(philos[1]->data->v_lock),&(philos[1]->data->end),1);
 		pthread_join(philos[j]->philo_id, NULL);
 		pthread_mutex_destroy(&philos[j]->philo_mtx);
 		j++;

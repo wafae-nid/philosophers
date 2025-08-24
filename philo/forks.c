@@ -6,7 +6,7 @@
 /*   By: wnid-hsa <wnid-hsa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/22 17:17:07 by wnid-hsa          #+#    #+#             */
-/*   Updated: 2025/08/22 18:14:25 by wnid-hsa         ###   ########.fr       */
+/*   Updated: 2025/08/24 03:20:05 by wnid-hsa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,21 +15,14 @@
 void	fork_take(t_philo **philos, t_fork **forks, int i)
 {
 	t_input_data	*data;
-	int				position;
 
 	data = philos[1]->data;
-	if (i % 2 == 0)
-	{
-		philos[i]->left_fork = (forks[i]);
-		position = ((i) % (data)->philo_num) + 1;
-		philos[i]->right_fork = (forks[position]);
-	}
+	
+	if(i == 1)
+		philos[i]->left_fork = forks[philos[i]->data->philo_num];
 	else
-	{
-		position = ((i) % ((data)->philo_num)) + 1;
-		philos[i]->left_fork = (forks[position]);
-		philos[i]->right_fork = (forks[i]);
-	}
+		philos[i]->left_fork = forks[i - 1];
+	philos[i]->right_fork = forks[i];
 }
 
 t_fork	**fork_arry_saving(t_fork **fork)
